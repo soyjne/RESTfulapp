@@ -1,3 +1,5 @@
+<%- include('partials/header'); -%>
+
 <h1>Index</h1>
 
 <% buildingsVar.forEach(function(building){ %>
@@ -8,3 +10,5 @@
         <p><%= building.description  %></p>
     </div>
 <% }); %>
+
+<%- include('partials/footer'); -%>
