@@ -1,3 +1,7 @@
 i.icon {
     font-size: 2em;
 }
+
+.ui.text.container {
+    margin-top: 7em;
+}

@@ -19,6 +19,43 @@ var buildingSchema = new mongoose.Schema({
 
 var Building = mongoose.model("Building", buildingSchema);
 
+
+
+//RESTFUL ROUTES
+
+app.get('/', function (req, res) {
+  res.redirect('/buildings');
+});
+
+// INDEX ROUTE
+app.get("/buildings", function(req, res) {
+    Building.find ({}, function(err, buildings){
+        if (err){
+          console.log("HUBO UN ERROR")
+        }else{
+          res.render("index", {buildingsVar: buildings});
+        };
+    });    
+});
+
+// NEW ROUTE
+app.get('/buildings/new', function (req, res) {
+  res.render("new");
+});
+
+// CREATE ROUTE
+
+app.post("/buildings", function(req, res) {
+    // Add newBuilding to to the db
+    Building.create (req.body.building, function(err,newBuilding){
+      if (err){
+        res.render("new")
+      }else{
+        res.redirect("/buildings");
+      };
+    });
+});
+
 // Building.create ({
 //     title: "Test Building",
 //     image: "https://images.freeimages.com/images/large-previews/58f/edificios-1230443.jpg",
@@ -31,22 +68,7 @@ var Building = mongoose.model("Building", buildingSchema);
 //   };
 // });
 
-//RESTFUL ROUTES
 
-app.get('/', function (req, res) {
-  res.redirect('/buildings');
-});
-
-
-app.get("/buildings", function(req, res) {
-    Building.find ({}, function(err, buildings){
-        if (err){
-          console.log("HUBO UN ERROR")
-        }else{
-          res.render("index", {buildingsVar: buildings});
-        };
-    });    
-  });
 
 // Consultar friends
 
@@ -62,23 +84,7 @@ app.get("/buildings", function(req, res) {
 
 
 
-// app.post("/addFriend", function(req, res) {
-//     var newFriend = req.body.newfriend;
-//     var newAge = req.body.newage;
-//     var newSkill = req.body.newskill;
-//     // Add newFriend to to the db
-//     Friend.create ({
-//       name: newFriend,
-//       age: newAge,
-//       temperament: newSkill
-//     }, function(err,friend){
-//       if (err){
-//         console.log("HUBO UN ERROR"n)
-//       }else{
-//         res.redirect("/friends");
-//       };
-//     });
-// });
+
 
 
 
