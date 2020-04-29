@@ -7,7 +7,8 @@
         <h2><%= building.title  %></h2></br>
         <img src="<%= building.image  %>" ></br>
         <span><%= building.created  %></span></br>
-        <p><%= building.description  %></p>
+        <p><%= building.description.substring(0, 100) %>...</p>
+        <a href="/buildings/<%= building._id  %>">Leer mas...</a>
     </div>
 <% }); %>
 
