@@ -1,15 +1,19 @@
-var express        = require("express");
-var app            = express();
-var bodyParser     = require("body-parser");
-var mongoose       = require("mongoose")
-var methodOverride = require("method-override")
+var express          = require("express");
+var app              = express();
+var bodyParser       = require("body-parser");
+var expressSanitizer = require("express-sanitizer")
+var mongoose         = require("mongoose")
+var methodOverride   = require("method-override")
+
 
 //APP CONFIG
 mongoose.connect('mongodb://localhost:27017/building_app', { useNewUrlParser: true, useUnifiedTopology: true });
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(expressSanitizer()); // Va despues del bodyParser. Es para evitar javascript en inputs del usuario
 app.use(express.static("public"));
 app.use(methodOverride("_method"));
+
 
 //MONGOOSE MODEL CONFIG
 var buildingSchema = new mongoose.Schema({
@@ -48,7 +52,10 @@ app.get('/buildings/new', function (req, res) {
 // CREATE ROUTE
 
 app.post("/buildings", function(req, res) {
-    // Add newBuilding to to the db
+  req.body.building.title = req.sanitize(req.body.building.title);
+  req.body.building.image = req.sanitize(req.body.building.image);
+  req.body.building.description = req.sanitize(req.body.building.description);
+  // Add newBuilding to to the db
     Building.create (req.body.building, function(err,newBuilding){
       if (err){
         res.render("new")
@@ -83,39 +90,31 @@ app.get('/buildings/:id/edit', function (req, res) {
 // UPDATE ROUTE
 
 app.put("/buildings/:id", function(req, res) {
+  req.body.building.title = req.sanitize(req.body.building.title);
+  req.body.building.image = req.sanitize(req.body.building.image);
+  req.body.building.description = req.sanitize(req.body.building.description);
   Building.findByIdAndUpdate (req.params.id, req.body.building, function(err,updatedBuilding){
     if (err){
-      res.render("new")
+      res.render("error")
     }else{
       res.redirect("/buildings/" + req.params.id);
     };
   });
 });
 
-// Building.create ({
-//     title: "Test Building",
-//     image: "https://images.freeimages.com/images/large-previews/58f/edificios-1230443.jpg",
-//     description: "Este es el edificio",
-// }, function(err,building){
-//   if (err){
-//     console.log("HUBO UN ERROR")
-//   }else{
-//     console.log("EDIFICIO AGREGADO")
-//   };
-// });
 
+// DELETE ROUTE
 
+app.delete('/buildings/:id', function (req, res) {
+  Building.findByIdAndDelete (req.params.id, function(err){
+    if (err){
+      res.render("error")
+    }else{
+      res.redirect("/buildings");
+    };
+  });
+});
 
-// Consultar friends
-
-// Friend.find ({}, function(err,friends){
-//   if (err){
-//     console.log("HUBO UN ERROR")
-//   }else{
-//     console.log("FRIENDS ENCONTRADOS")
-//     console.log(friends)
-//   };
-// });
 
 
 // app.get('*', function (req, res) {

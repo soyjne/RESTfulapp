@@ -11,6 +11,13 @@
                 <div class="description">
                     <p><%= BuildingShowVar.description %></p>
                 </div>
+                <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>/edit" method="GET">
+                    <button class="ui orange basic button">Edit</button>
+                </form>              
+                <!-- OTRA OPCION AL BOTON EDIT <a class="ui orange basic button" href="/buildings/<%= BuildingShowVar._id %>/edit">Edit</a> */%> -->
+                <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>?_method=DELETE" method="POST">
+                    <button class="ui red basic button">Delete</button>
+                </form>
             </div>
         </div>
 </div>
