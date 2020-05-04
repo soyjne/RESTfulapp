@@ -1,4 +1,4 @@
-<%- include('partials/header'); -%>
+<%- include('../partials/header'); -%>
 
 <div class="ui main text container segment">
     <div class="ui huge header"><%= BuildingShowVar.title %></div>
@@ -18,8 +18,18 @@
                 <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>?_method=DELETE" method="POST">
                     <button class="ui red basic button">Delete</button>
                 </form>
+                <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>/comments/new" method="GET">
+                    <button class="ui blue basic button">Add Comment</button>
+                </form>
+                
+                <% BuildingShowVar.comments.forEach(function(comment){ %>
+                    <p>
+                        <strong><%= comment.author %></strong> - <%= comment.text %> 
+                    </p>
+                <% }); %>
             </div>
         </div>
+    </div>
 </div>
 
-<%- include('partials/footer'); -%>
+<%- include('../partials/footer'); -%>

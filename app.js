@@ -4,6 +4,8 @@ var bodyParser       = require("body-parser");
 var expressSanitizer = require("express-sanitizer")
 var mongoose         = require("mongoose")
 var methodOverride   = require("method-override")
+var Building         = require("./models/building")
+var Comment          = require("./models/comment")
 
 
 //APP CONFIG
@@ -15,23 +17,17 @@ app.use(express.static("public"));
 app.use(methodOverride("_method"));
 
 
-//MONGOOSE MODEL CONFIG
-var buildingSchema = new mongoose.Schema({
-  title: String,
-  image: String,
-  description: String,
-  created: {type: Date, default: Date.now}
-});
-
-var Building = mongoose.model("Building", buildingSchema);
-
-
-
 //RESTFUL ROUTES
 
 app.get('/', function (req, res) {
   res.redirect('/buildings');
 });
+
+
+//------------------
+// BUIlDINGS ROUTES
+//------------------
+
 
 // INDEX ROUTE
 app.get("/buildings", function(req, res) {
@@ -39,14 +35,14 @@ app.get("/buildings", function(req, res) {
         if (err){
           console.log("HUBO UN ERROR")
         }else{
-          res.render("index", {buildingsVar: buildings});
+          res.render("buildings/index", {buildingsVar: buildings});
         };
     });    
 });
 
 // NEW ROUTE
 app.get('/buildings/new', function (req, res) {
-  res.render("new");
+  res.render("buildings/new");
 });
 
 // CREATE ROUTE
@@ -58,20 +54,31 @@ app.post("/buildings", function(req, res) {
   // Add newBuilding to to the db
     Building.create (req.body.building, function(err,newBuilding){
       if (err){
-        res.render("new")
+        res.render("buildings/new")
       }else{
         res.redirect("/buildings");
       };
     });
 });
 
-// SHOW ROUTE
+// SHOW ROUTE NORMAL
+// app.get('/buildings/:id', function (req, res) {
+//   Building.findById (req.params.id, function(err,foundBuilding){
+//     if (err){
+//       console.log("HUBO UN ERROR " + err)
+//     }else{
+//       res.render("show", {BuildingShowVar: foundBuilding});
+//     }
+//   });    
+// });
+
+// SHOW ROUTE + SHOW COMMENTS DEL BUILDING
 app.get('/buildings/:id', function (req, res) {
-  Building.findById (req.params.id, function(err,foundBuilding){
+  Building.findById (req.params.id).populate("comments").exec(function(err,foundBuilding){
     if (err){
       console.log("HUBO UN ERROR " + err)
     }else{
-      res.render("show", {BuildingShowVar: foundBuilding});
+      res.render("buildings/show", {BuildingShowVar: foundBuilding});
     }
   });    
 });
@@ -82,7 +89,7 @@ app.get('/buildings/:id/edit', function (req, res) {
     if (err){
       console.log("HUBO UN ERROR " + err)
     }else{
-      res.render("edit", {BuildingShowVar: foundBuilding});
+      res.render("buildings/edit", {BuildingShowVar: foundBuilding});
     }
   });    
 });
@@ -115,11 +122,45 @@ app.delete('/buildings/:id', function (req, res) {
   });
 });
 
+//------------------
+// COMMENTS ROUTES
+//------------------
+
+//NEW COMMENT
+app.get('/buildings/:id/comments/new', function (req, res) {
+  Building.findById(req.params.id, function(err, building){
+    if(err){
+      console.log(err)
+    } else {
+      res.render("comments/new", {buildingVar: building});
+    }
+  })
+});
 
 
-// app.get('*', function (req, res) {
-//   res.send('Sorry, page not found. What are you doing with your life?');
-// });
+// CREATE COMMENT
+
+app.post("/buildings/:id/comments", function(req, res) {
+  Building.findById(req.params.id, function(err, building){
+    if(err){
+      console.log(err)
+    } else {
+      Comment.create (req.body.comment, function(err, comment){
+        if (err){
+          console.log(err)
+        }else{
+          building.comments.push(comment);
+          building.save();
+          res.redirect("/buildings/" + building._id);         
+        }  
+      })
+    };
+  });      
+});
+
+app.get('*', function (req, res) {
+   res.send('Sorry, page not found. What are you doing with your life?');
+});
 
 var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
 
