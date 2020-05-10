@@ -18,10 +18,13 @@
                 <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>?_method=DELETE" method="POST">
                     <button class="ui red basic button">Delete</button>
                 </form>
-                <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>/comments/new" method="GET">
+                </br>
+                </br>
+                </br>
+                <form action="/buildings/<%= BuildingShowVar._id %>/comments/new" method="GET">
                     <button class="ui blue basic button">Add Comment</button>
                 </form>
-                
+                </br>
                 <% BuildingShowVar.comments.forEach(function(comment){ %>
                     <p>
                         <strong><%= comment.author %></strong> - <%= comment.text %> 

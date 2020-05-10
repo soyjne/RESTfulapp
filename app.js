@@ -1,9 +1,13 @@
 var express          = require("express");
 var app              = express();
-var bodyParser       = require("body-parser");
-var expressSanitizer = require("express-sanitizer")
-var mongoose         = require("mongoose")
-var methodOverride   = require("method-override")
+var bodyParser       = require("body-parser"); //Para leer el body de un POST method
+var expressSanitizer = require("express-sanitizer") //elimina etiquetas html dentro de un string
+var mongoose         = require("mongoose") //database
+var passport         = require("passport") //authentication
+var localStrategy    = require("passport-local") //authentication
+var methodOverride   = require("method-override")// Para poder usar update y delete dado que no son aceptados como methods en HTML
+
+var User             = require("./models/user")
 var Building         = require("./models/building")
 var Comment          = require("./models/comment")
 
@@ -15,6 +19,18 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(expressSanitizer()); // Va despues del bodyParser. Es para evitar javascript en inputs del usuario
 app.use(express.static("public"));
 app.use(methodOverride("_method"));
+
+//PASSPORT CONFIG - USER AUTHENTICATION
+app.use(require("express-session")({
+  secret: "El secreto",
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 
 //RESTFUL ROUTES
@@ -86,6 +102,8 @@ app.get('/buildings/:id', function (req, res) {
 // EDIT ROUTE
 app.get('/buildings/:id/edit', function (req, res) {
   Building.findById (req.params.id, function(err,foundBuilding){
+    console.log(req.params.id);
+    console.log(foundBuilding);
     if (err){
       console.log("HUBO UN ERROR " + err)
     }else{
@@ -157,6 +175,29 @@ app.post("/buildings/:id/comments", function(req, res) {
     };
   });      
 });
+
+
+//------------------------
+//USERS ROUTES
+//------------------------
+
+app.get("/register", function(req, res){
+  res.render("users/register");
+});
+
+app.post("/register", function(req, res){
+  var newUser = new User({username: req.body.username});
+  User.register(newUser, req.body.password, function(err, user){ //registro del usuario
+    if(err){
+      console.log(err)
+      return res.render("users/register")
+    }
+    passport.authenticate("local")(req, res, function(){ //logueo del usuario
+      res.redirect("/buildings");
+    });
+  });
+});
+
 
 app.get('*', function (req, res) {
    res.send('Sorry, page not found. What are you doing with your life?');
