@@ -31,7 +31,10 @@ app.use(passport.session());
 passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-
+app.use(function(req,res,next){
+  res.locals.currentUser = req.user;
+  next();
+});
 
 //RESTFUL ROUTES
 
@@ -62,7 +65,6 @@ app.get('/buildings/new', function (req, res) {
 });
 
 // CREATE ROUTE
-
 app.post("/buildings", function(req, res) {
   req.body.building.title = req.sanitize(req.body.building.title);
   req.body.building.image = req.sanitize(req.body.building.image);
@@ -113,7 +115,6 @@ app.get('/buildings/:id/edit', function (req, res) {
 });
 
 // UPDATE ROUTE
-
 app.put("/buildings/:id", function(req, res) {
   req.body.building.title = req.sanitize(req.body.building.title);
   req.body.building.image = req.sanitize(req.body.building.image);
@@ -129,7 +130,6 @@ app.put("/buildings/:id", function(req, res) {
 
 
 // DELETE ROUTE
-
 app.delete('/buildings/:id', function (req, res) {
   Building.findByIdAndDelete (req.params.id, function(err){
     if (err){
@@ -145,7 +145,7 @@ app.delete('/buildings/:id', function (req, res) {
 //------------------
 
 //NEW COMMENT
-app.get('/buildings/:id/comments/new', function (req, res) {
+app.get('/buildings/:id/comments/new', isLoggedIn, function (req, res) {
   Building.findById(req.params.id, function(err, building){
     if(err){
       console.log(err)
@@ -158,7 +158,7 @@ app.get('/buildings/:id/comments/new', function (req, res) {
 
 // CREATE COMMENT
 
-app.post("/buildings/:id/comments", function(req, res) {
+app.post("/buildings/:id/comments", isLoggedIn, function(req, res) {
   Building.findById(req.params.id, function(err, building){
     if(err){
       console.log(err)
@@ -197,6 +197,29 @@ app.post("/register", function(req, res){
     });
   });
 });
+
+app.get("/login", function(req, res){
+  res.render("users/login");
+});
+
+app.post("/login", passport.authenticate("local",
+            {
+              successRedirect: "/buildings",
+              failureRedirect: "/login"
+            }), function(req, res){
+});
+
+app.get("/logout", function(req,res){
+  req.logout();
+  res.redirect("/buildings");
+});
+
+function isLoggedIn(req,res,next){
+  if(req.isAuthenticated()){
+    return next()
+  }
+  res.redirect("/login");
+};
 
 
 app.get('*', function (req, res) {

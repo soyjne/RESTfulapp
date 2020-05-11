@@ -23,5 +23,13 @@
             <div class="header item"><i class="code icon"></i>Buildings Site</div>
             <a href="/" class="item">Home</a>
             <a href="/buildings/new" class="item">New Building</a>
+            <div class="header item right"></div>
+            <% if (!currentUser) { %>
+                <a href="/login" class="item">Log In</a>
+                <a href="/register" class="item">Register</a>
+            <% } else { %>
+                <a class="item">Signed in as <%- currentUser.username %></a>
+                <a href="/logout" class="item">Log Out</a>
+            <% }; %>
         </div>
     </div>
