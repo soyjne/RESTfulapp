@@ -5,12 +5,20 @@
         <div class="ui top attachedr">
             <div class="item">
                 <img class="ui centered rounded image" src="<%= BuildingShowVar.image  %>" >
-                <div class="content">    
-                    <span><%= BuildingShowVar.created.toDateString()  %></span>
-                </div>
+                </br>
                 <div class="description">
                     <p><%= BuildingShowVar.description %></p>
                 </div>
+                </br>
+                <div>
+                    <p>Subido por <%= BuildingShowVar.author.username %></p>
+                </div>
+                <div class="content">    
+                    <span><%= BuildingShowVar.created.toDateString()  %></span>
+                </div>
+                </br>
+                </br>
+                </br>
                 <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>/edit" method="GET">
                     <button class="ui orange basic button">Edit</button>
                 </form>              

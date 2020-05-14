@@ -60,16 +60,17 @@ app.get("/buildings", function(req, res) {
 });
 
 // NEW ROUTE
-app.get('/buildings/new', function (req, res) {
+app.get('/buildings/new', isLoggedIn, function (req, res) {
   res.render("buildings/new");
 });
 
 // CREATE ROUTE
-app.post("/buildings", function(req, res) {
+app.post("/buildings", isLoggedIn, function(req, res) {
   req.body.building.title = req.sanitize(req.body.building.title);
   req.body.building.image = req.sanitize(req.body.building.image);
   req.body.building.description = req.sanitize(req.body.building.description);
-  // Add newBuilding to to the db
+  req.body.building.author = { id: req.user._id, username: req.user.username}
+    // Add newBuilding to to the db
     Building.create (req.body.building, function(err,newBuilding){
       if (err){
         res.render("buildings/new")
@@ -102,10 +103,9 @@ app.get('/buildings/:id', function (req, res) {
 });
 
 // EDIT ROUTE
-app.get('/buildings/:id/edit', function (req, res) {
+app.get('/buildings/:id/edit', isLoggedIn, function (req, res) {
   Building.findById (req.params.id, function(err,foundBuilding){
     console.log(req.params.id);
-    console.log(foundBuilding);
     if (err){
       console.log("HUBO UN ERROR " + err)
     }else{
@@ -115,7 +115,7 @@ app.get('/buildings/:id/edit', function (req, res) {
 });
 
 // UPDATE ROUTE
-app.put("/buildings/:id", function(req, res) {
+app.put("/buildings/:id", isLoggedIn, function(req, res) {
   req.body.building.title = req.sanitize(req.body.building.title);
   req.body.building.image = req.sanitize(req.body.building.image);
   req.body.building.description = req.sanitize(req.body.building.description);
@@ -130,7 +130,7 @@ app.put("/buildings/:id", function(req, res) {
 
 
 // DELETE ROUTE
-app.delete('/buildings/:id', function (req, res) {
+app.delete('/buildings/:id', isLoggedIn, function (req, res) {
   Building.findByIdAndDelete (req.params.id, function(err){
     if (err){
       res.render("error")
