@@ -16,6 +16,7 @@
                 <div class="content">    
                     <span><%= BuildingShowVar.created.toDateString()  %></span>
                 </div>
+                <% if (currentUser && BuildingShowVar.author.id.equals(currentUser._id)) { %>
                 </br>
                 </br>
                 </br>
@@ -26,6 +27,7 @@
                 <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>?_method=DELETE" method="POST">
                     <button class="ui red basic button">Delete</button>
                 </form>
+                <% }; %>
                 </br>
                 </br>
                 </br>

@@ -31,10 +31,12 @@ app.use(passport.session());
 passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-app.use(function(req,res,next){
+app.use(function(req,res,next){ //Permite utilizar datos del user en las views (ejs)
   res.locals.currentUser = req.user;
   next();
 });
+
+
 
 //RESTFUL ROUTES
 
@@ -103,9 +105,8 @@ app.get('/buildings/:id', function (req, res) {
 });
 
 // EDIT ROUTE
-app.get('/buildings/:id/edit', isLoggedIn, function (req, res) {
+app.get('/buildings/:id/edit', escreadoredificio, function (req, res) {
   Building.findById (req.params.id, function(err,foundBuilding){
-    console.log(req.params.id);
     if (err){
       console.log("HUBO UN ERROR " + err)
     }else{
@@ -115,7 +116,7 @@ app.get('/buildings/:id/edit', isLoggedIn, function (req, res) {
 });
 
 // UPDATE ROUTE
-app.put("/buildings/:id", isLoggedIn, function(req, res) {
+app.put("/buildings/:id", escreadoredificio, function(req, res) {
   req.body.building.title = req.sanitize(req.body.building.title);
   req.body.building.image = req.sanitize(req.body.building.image);
   req.body.building.description = req.sanitize(req.body.building.description);
@@ -130,7 +131,7 @@ app.put("/buildings/:id", isLoggedIn, function(req, res) {
 
 
 // DELETE ROUTE
-app.delete('/buildings/:id', isLoggedIn, function (req, res) {
+app.delete('/buildings/:id', escreadoredificio, function (req, res) {
   Building.findByIdAndDelete (req.params.id, function(err){
     if (err){
       res.render("error")
@@ -222,6 +223,24 @@ function isLoggedIn(req,res,next){
     return next()
   }
   res.redirect("/login");
+};
+
+function escreadoredificio(req,res,next) {
+  if(req.isAuthenticated()){
+    Building.findById (req.params.id, function(err, foundBuilding){
+      if (err){
+        console.log("HUBO UN ERROR " + err)
+      }else{
+        if(foundBuilding.author.id.equals(req.user._id)) {
+          next();
+        }else{
+          res.redirect("back");
+        }
+      } 
+    })
+  }else{
+    res.redirect("/login")
+  };
 };
 
 
