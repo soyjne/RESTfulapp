@@ -180,6 +180,46 @@ app.post("/buildings/:id/comments", isLoggedIn, function(req, res) {
   });      
 });
 
+//EDIT COMMENT
+app.get('/buildings/:id/comments/:comment_id/edit', function (req, res) {
+  Building.findById(req.params.id, function(err, building){
+    if (err){
+      console.log("HUBO UN ERROR " + err)
+    }else{
+      Comment.findById(req.params.comment_id, function(err, comment){
+        if (err){
+          console.log(err)
+        }else{
+          res.render("comments/edit", {buildingVar: building, commentVar: comment});
+        }      
+      })
+    }  
+  })
+});
+
+// UPDATE COMMENT
+app.put("/buildings/:id/comments/:comment_id", function(req, res) {
+  req.body.comment.text = req.sanitize(req.body.comment.text);
+  Comment.findByIdAndUpdate (req.params.comment_id, req.body.comment, function(err,updatedComment){
+    if (err){
+      res.render("error")
+    }else{
+      res.redirect("/buildings/" + req.params.id);
+    };
+  });
+});
+
+// DELETE ROUTE
+app.delete('/buildings/:id/comments/:comment_id', function (req, res) {
+  Comment.findByIdAndDelete (req.params.comment_id, function(err){
+    if (err){
+      res.render("error")
+    }else{
+      res.redirect("/buildings/" + req.params.id);
+    };
+  });
+});
+
 
 //------------------------
 //USERS ROUTES
