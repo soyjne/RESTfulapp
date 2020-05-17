@@ -16,7 +16,7 @@
                 <div class="content">    
                     <span><%= BuildingShowVar.created.toDateString()  %></span>
                 </div>
-                <% if (currentUser && BuildingShowVar.author.id.equals(currentUser._id)) { %>
+               <% if (currentUser && BuildingShowVar.author.id.equals(currentUser._id)) { %>
                 </br>
                 </br>
                 </br>
@@ -38,12 +38,14 @@
                 <% BuildingShowVar.comments.forEach(function(comment){ %>
                     <p>
                         <strong><%= comment.author.username %></strong> - <%= comment.text %> 
-                        <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>/comments/<%= comment._id %>/edit" method="GET">
-                            <button class="ui orange basic mini button">Edit</button>
-                        </form>
-                        <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
-                            <button class="ui red basic mini button">Delete</button>
-                        </form>
+                        <% if (currentUser && comment.author.id.equals(currentUser._id)) { %>
+                            <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>/comments/<%= comment._id %>/edit" method="GET">
+                                <button class="ui orange basic mini button">Edit</button>
+                            </form>
+                            <form class="inlinebutton" action="/buildings/<%= BuildingShowVar._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
+                                <button class="ui red basic mini button">Delete</button>
+                            </form>
+                        <% }; %>
                     </p>
                     </br>
                 <% }); %>

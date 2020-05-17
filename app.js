@@ -173,7 +173,7 @@ app.post("/buildings/:id/comments", isLoggedIn, function(req, res) {
           comment.save();
           building.comments.push(comment);
           building.save();
-          res.redirect("/buildings/" + building._id);         
+          res.redirect("/buildings/" + req.params.id);         
         }  
       })
     };
@@ -181,7 +181,7 @@ app.post("/buildings/:id/comments", isLoggedIn, function(req, res) {
 });
 
 //EDIT COMMENT
-app.get('/buildings/:id/comments/:comment_id/edit', function (req, res) {
+app.get('/buildings/:id/comments/:comment_id/edit', escreadorcomentario, function (req, res) {
   Building.findById(req.params.id, function(err, building){
     if (err){
       console.log("HUBO UN ERROR " + err)
@@ -198,7 +198,7 @@ app.get('/buildings/:id/comments/:comment_id/edit', function (req, res) {
 });
 
 // UPDATE COMMENT
-app.put("/buildings/:id/comments/:comment_id", function(req, res) {
+app.put("/buildings/:id/comments/:comment_id", escreadorcomentario, function(req, res) {
   req.body.comment.text = req.sanitize(req.body.comment.text);
   Comment.findByIdAndUpdate (req.params.comment_id, req.body.comment, function(err,updatedComment){
     if (err){
@@ -209,8 +209,8 @@ app.put("/buildings/:id/comments/:comment_id", function(req, res) {
   });
 });
 
-// DELETE ROUTE
-app.delete('/buildings/:id/comments/:comment_id', function (req, res) {
+// DELETE COMMENT
+app.delete('/buildings/:id/comments/:comment_id', escreadorcomentario, function (req, res) {
   Comment.findByIdAndDelete (req.params.comment_id, function(err){
     if (err){
       res.render("error")
@@ -274,6 +274,26 @@ function escreadoredificio(req,res,next) {
         if(foundBuilding.author.id.equals(req.user._id)) {
           next();
         }else{
+          alert("NO SOS EL USUARIO CREADOR DE ESTE EDIFICIO")
+          res.redirect("back");
+        }
+      } 
+    })
+  }else{
+    res.redirect("/login")
+  };
+};
+
+function escreadorcomentario(req,res,next) {
+  if(req.isAuthenticated()){
+    Comment.findById (req.params.comment_id, function(err, foundComment){
+      if (err){
+        console.log("HUBO UN ERROR " + err)
+      }else{
+        if(foundComment.author.id.equals(req.user._id)) {
+          next();
+        }else{
+          alert("NO SOS EL USUARIO CREADOR DE ESTE COMENTARIO")
           res.redirect("back");
         }
       } 
