@@ -3,6 +3,7 @@ var app              = express();
 var bodyParser       = require("body-parser"); //Para leer el body de un POST method
 var expressSanitizer = require("express-sanitizer") //elimina etiquetas html dentro de un string
 var mongoose         = require("mongoose") //database
+var flash            = require("connect-flash")
 var passport         = require("passport") //authentication
 var localStrategy    = require("passport-local") //authentication
 var methodOverride   = require("method-override")// Para poder usar update y delete dado que no son aceptados como methods en HTML
@@ -20,6 +21,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(expressSanitizer()); // Va despues del bodyParser. Es para evitar javascript en inputs del usuario
 app.use(express.static("public"));
 app.use(methodOverride("_method"));
+app.use(flash());
 
 //PASSPORT CONFIG - USER AUTHENTICATION
 app.use(require("express-session")({
@@ -32,8 +34,10 @@ app.use(passport.session());
 passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-app.use(function(req,res,next){ //Permite utilizar datos del user en las views (ejs)
-  res.locals.currentUser = req.user;
+app.use(function(req,res,next){ 
+  res.locals.currentUser = req.user; //Permite utilizar datos del user en las views (ejs)
+  res.locals.error = req.flash("error");
+  res.locals.success = req.flash("success");
   next();
 });
 
@@ -234,8 +238,7 @@ app.post("/register", function(req, res){
   var newUser = new User({username: req.body.username});
   User.register(newUser, req.body.password, function(err, user){ //registro del usuario
     if(err){
-      console.log(err)
-      return res.render("users/register")
+      return res.render("users/register", {"error": err.message});
     }
     passport.authenticate("local")(req, res, function(){ //logueo del usuario
       res.redirect("/buildings");
@@ -250,12 +253,14 @@ app.get("/login", function(req, res){
 app.post("/login", passport.authenticate("local",
             {
               successRedirect: "/buildings",
-              failureRedirect: "/login"
+              failureRedirect: "/login",
+              failureFlash : true
             }), function(req, res){
 });
 
 app.get("/logout", function(req,res){
   req.logout();
+  req.flash("success", "Deslogueado exitosamente")
   res.redirect("/buildings");
 });
 
