@@ -10,10 +10,11 @@ var methodOverride   = require("method-override")// Para poder usar update y del
 var User             = require("./models/user")
 var Building         = require("./models/building")
 var Comment          = require("./models/comment")
+var middleware       = require("./middleware")
 
 
 //APP CONFIG
-mongoose.connect('mongodb://localhost:27017/building_app', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://localhost:27017/building_app2', { useNewUrlParser: true, useUnifiedTopology: true });
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(expressSanitizer()); // Va despues del bodyParser. Es para evitar javascript en inputs del usuario
@@ -62,12 +63,12 @@ app.get("/buildings", function(req, res) {
 });
 
 // NEW ROUTE
-app.get('/buildings/new', isLoggedIn, function (req, res) {
+app.get('/buildings/new', middleware.isLoggedIn, function (req, res) {
   res.render("buildings/new");
 });
 
 // CREATE ROUTE
-app.post("/buildings", isLoggedIn, function(req, res) {
+app.post("/buildings", middleware.isLoggedIn, function(req, res) {
   req.body.building.title = req.sanitize(req.body.building.title);
   req.body.building.image = req.sanitize(req.body.building.image);
   req.body.building.description = req.sanitize(req.body.building.description);
@@ -105,7 +106,7 @@ app.get('/buildings/:id', function (req, res) {
 });
 
 // EDIT ROUTE
-app.get('/buildings/:id/edit', escreadoredificio, function (req, res) {
+app.get('/buildings/:id/edit', middleware.escreadoredificio, function (req, res) {
   Building.findById (req.params.id, function(err,foundBuilding){
     if (err){
       console.log("HUBO UN ERROR " + err)
@@ -116,7 +117,7 @@ app.get('/buildings/:id/edit', escreadoredificio, function (req, res) {
 });
 
 // UPDATE ROUTE
-app.put("/buildings/:id", escreadoredificio, function(req, res) {
+app.put("/buildings/:id", middleware.escreadoredificio, function(req, res) {
   req.body.building.title = req.sanitize(req.body.building.title);
   req.body.building.image = req.sanitize(req.body.building.image);
   req.body.building.description = req.sanitize(req.body.building.description);
@@ -131,7 +132,7 @@ app.put("/buildings/:id", escreadoredificio, function(req, res) {
 
 
 // DELETE ROUTE
-app.delete('/buildings/:id', escreadoredificio, function (req, res) {
+app.delete('/buildings/:id', middleware.escreadoredificio, function (req, res) {
   Building.findByIdAndDelete (req.params.id, function(err){
     if (err){
       res.render("error")
@@ -146,7 +147,7 @@ app.delete('/buildings/:id', escreadoredificio, function (req, res) {
 //------------------
 
 //NEW COMMENT
-app.get('/buildings/:id/comments/new', isLoggedIn, function (req, res) {
+app.get('/buildings/:id/comments/new', middleware.isLoggedIn, function (req, res) {
   Building.findById(req.params.id, function(err, building){
     if(err){
       console.log(err)
@@ -159,7 +160,7 @@ app.get('/buildings/:id/comments/new', isLoggedIn, function (req, res) {
 
 // CREATE COMMENT
 
-app.post("/buildings/:id/comments", isLoggedIn, function(req, res) {
+app.post("/buildings/:id/comments", middleware.isLoggedIn, function(req, res) {
   Building.findById(req.params.id, function(err, building){
     if(err){
       console.log(err)
@@ -181,7 +182,7 @@ app.post("/buildings/:id/comments", isLoggedIn, function(req, res) {
 });
 
 //EDIT COMMENT
-app.get('/buildings/:id/comments/:comment_id/edit', escreadorcomentario, function (req, res) {
+app.get('/buildings/:id/comments/:comment_id/edit', middleware.escreadorcomentario, function (req, res) {
   Building.findById(req.params.id, function(err, building){
     if (err){
       console.log("HUBO UN ERROR " + err)
@@ -198,7 +199,7 @@ app.get('/buildings/:id/comments/:comment_id/edit', escreadorcomentario, functio
 });
 
 // UPDATE COMMENT
-app.put("/buildings/:id/comments/:comment_id", escreadorcomentario, function(req, res) {
+app.put("/buildings/:id/comments/:comment_id", middleware.escreadorcomentario, function(req, res) {
   req.body.comment.text = req.sanitize(req.body.comment.text);
   Comment.findByIdAndUpdate (req.params.comment_id, req.body.comment, function(err,updatedComment){
     if (err){
@@ -210,7 +211,7 @@ app.put("/buildings/:id/comments/:comment_id", escreadorcomentario, function(req
 });
 
 // DELETE COMMENT
-app.delete('/buildings/:id/comments/:comment_id', escreadorcomentario, function (req, res) {
+app.delete('/buildings/:id/comments/:comment_id', middleware.escreadorcomentario, function (req, res) {
   Comment.findByIdAndDelete (req.params.comment_id, function(err){
     if (err){
       res.render("error")
@@ -258,50 +259,7 @@ app.get("/logout", function(req,res){
   res.redirect("/buildings");
 });
 
-function isLoggedIn(req,res,next){
-  if(req.isAuthenticated()){
-    return next()
-  }
-  res.redirect("/login");
-};
 
-function escreadoredificio(req,res,next) {
-  if(req.isAuthenticated()){
-    Building.findById (req.params.id, function(err, foundBuilding){
-      if (err){
-        console.log("HUBO UN ERROR " + err)
-      }else{
-        if(foundBuilding.author.id.equals(req.user._id)) {
-          next();
-        }else{
-          alert("NO SOS EL USUARIO CREADOR DE ESTE EDIFICIO")
-          res.redirect("back");
-        }
-      } 
-    })
-  }else{
-    res.redirect("/login")
-  };
-};
-
-function escreadorcomentario(req,res,next) {
-  if(req.isAuthenticated()){
-    Comment.findById (req.params.comment_id, function(err, foundComment){
-      if (err){
-        console.log("HUBO UN ERROR " + err)
-      }else{
-        if(foundComment.author.id.equals(req.user._id)) {
-          next();
-        }else{
-          alert("NO SOS EL USUARIO CREADOR DE ESTE COMENTARIO")
-          res.redirect("back");
-        }
-      } 
-    })
-  }else{
-    res.redirect("/login")
-  };
-};
 
 
 app.get('*', function (req, res) {
