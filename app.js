@@ -102,7 +102,8 @@ app.post("/buildings", middleware.isLoggedIn, function(req, res) {
 app.get('/buildings/:id', function (req, res) {
   Building.findById (req.params.id).populate("comments").exec(function(err,foundBuilding){
     if (err){
-      console.log("HUBO UN ERROR " + err)
+      req.flash("error", "Error. El edificio no fue encontrado")
+      res.redirect("/buildings")
     }else{
       res.render("buildings/show", {BuildingShowVar: foundBuilding});
     }
