@@ -15,7 +15,10 @@ var middleware       = require("./middleware")
 
 
 //APP CONFIG
-mongoose.connect('mongodb://localhost:27017/building_app2', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb+srv://dbsoyjne:db123456@buildingapp-0rrib.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
+//mongodb+srv://dbsoyjne:db123456@buildingapp-0rrib.mongodb.net/test?retryWrites=true&w=majority
+//mongodb://localhost:27017/building_app2
+
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(expressSanitizer()); // Va despues del bodyParser. Es para evitar javascript en inputs del usuario
