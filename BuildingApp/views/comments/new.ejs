@@ -1,0 +1,14 @@
+<%- include('../partials/header'); -%>
+
+<div class="ui main text container segment">
+    <div class="ui huge header">Nuevo Comentario al edificio <%= buildingVar.title %></div>
+        <form class="ui form" action="/buildings/<%= buildingVar._id %>/comments" method="POST">
+            <div class="field">
+                <label>Texto:</label>
+                <input type="text" name="comment[text]" placeholder="Texto del comentario">
+            </div>
+            <input class = "ui basic violet button" type="submit">
+        </form>
+</div>
+
+<%- include('../partials/footer'); -%>
