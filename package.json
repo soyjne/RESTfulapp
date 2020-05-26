@@ -1,5 +1,5 @@
 {
-    "name": "RESTfulapp",
+    "name": "restfulapp",
     "version": "1.0.0",
     "desctiption": "My First RESTFul APP",
     "main": "app.js",
