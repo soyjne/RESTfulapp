@@ -276,12 +276,14 @@ app.get('*', function (req, res) {
    res.send('Sorry, page not found. What are you doing with your life?');
 });
 
-var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
+app.listen(process.env.PORT, process.env.IP);
 
-var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
+// var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
 
-app.listen(server_port, server_ip_address, function () {
+// var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
 
-  console.log( "Listening on " + server_ip_address + ", port " + server_port )
+// app.listen(server_port, server_ip_address, function () {
 
-});
+//   console.log( "Listening on " + server_ip_address + ", port " + server_port )
+
+// });
