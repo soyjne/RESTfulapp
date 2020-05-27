@@ -16,7 +16,9 @@ var middleware       = require("./middleware")
 
 //APP CONFIG
 mongoose.connect('mongodb+srv://dbsoyjne:db123456@buildingapp-0rrib.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
+//Para conectar a la base de datos de MongoLab:
 //mongodb+srv://dbsoyjne:db123456@buildingapp-0rrib.mongodb.net/test?retryWrites=true&w=majority
+//Para conectar a la base de datos local de la Toshiba
 //mongodb://localhost:27017/building_app2
 
 app.set('view engine', 'ejs');
@@ -276,14 +278,16 @@ app.get('*', function (req, res) {
    res.send('Sorry, page not found. What are you doing with your life?');
 });
 
-app.listen(process.env.PORT, process.env.IP);
+//Para alojar en los puertos de Heroku:
+//app.listen(process.env.PORT, process.env.IP);
 
-// var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
+//Para alojar de forma local:
+ var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
 
-// var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
+ var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
 
-// app.listen(server_port, server_ip_address, function () {
+ app.listen(server_port, server_ip_address, function () {
 
-//   console.log( "Listening on " + server_ip_address + ", port " + server_port )
+   console.log( "Listening on " + server_ip_address + ", port " + server_port )
 
-// });
+ });
