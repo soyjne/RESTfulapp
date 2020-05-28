@@ -20,6 +20,10 @@ mongoose.connect('mongodb+srv://dbsoyjne:db123456@buildingapp-0rrib.mongodb.net/
 //mongodb+srv://dbsoyjne:db123456@buildingapp-0rrib.mongodb.net/test?retryWrites=true&w=majority
 //Para conectar a la base de datos local de la Toshiba
 //mongodb://localhost:27017/building_app2
+//Podria reemplazar la url de la base de datos con process.env.DATABASEURL, quedando mongoose.connect(process.env.DATABASEURL)
+//Pero para eso deberia configurar la variable process.env.DATABASE en el server local y en heroku:
+// En heroku se configura en la seccion settings -> Config Vars -> Reveal Config Vars -> KEY tiene que ser "process.env.DATABASE" y VALUE tiene que ser la url de mongolab "mongodb+srv://dbsoyjne:db123456@buildingapp-0rrib.mongodb.net/test?retryWrites=true&w=majority"
+// En el server local hay que escribir en la consola: export DATABASEURL=mongodb://localhost:27017/building_app2
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -281,10 +285,11 @@ app.get('*', function (req, res) {
 //Para alojar en los puertos de Heroku:
 //app.listen(process.env.PORT, process.env.IP);
 
-//Para alojar de forma local:
- var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
 
- var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
+//Para alojar de forma local:
+ var server_port = 8080
+
+ var server_ip_address = '127.0.0.1'
 
  app.listen(server_port, server_ip_address, function () {
 
